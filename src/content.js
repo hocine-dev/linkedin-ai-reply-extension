@@ -3,7 +3,7 @@
 
   // Configuration - Replace with your OpenRouter API key
   const OPENROUTER_API_KEY =
-    "your api key";
+    "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";
   const MODEL = "openai/gpt-3.5-turbo";
   let isButtonInserted = false;
 
@@ -119,18 +119,22 @@
     const firstname = extractFirstName();
     const Username = extractUsername();
 
-    const isEnglish = message.match(/[a-zA-Z]/) && !message.match(/[éèàùç]/i);
-
-const greeting = isEnglish
-  ? `Hello ${firstname},`
-  : `Bonjour ${firstname},`;
-
-const closing = isEnglish
-  ? `Best regards,\n${Username}`
-  : `Cordialement,\n${Username}`;
-
-    const prompt = `I have received the following message: "${message}" on linkedin. Please reply to it with an answer that is professional and well-structured starting by ${greeting}. The reply must be written in the same language as the message. Keep the answer under 10 lines, and make it shorter if the message is brief, the message must be ended with ${closing}`;
-
+    const prompt = `Analyze this LinkedIn message language: "${message}". 
+    Compose response IN THE SAME LANGUAGE using:
+    
+    1. Greeting in DETECTED LANGUAGE
+    \n
+    2. Response body (3-8 lines)
+    \n
+    3. Closing with name
+    
+    STRICT RULES:
+    - RESPOND ONLY WITH FINAL MESSAGE
+    - NO LANGUAGE ANNOTATIONS
+    - NEVER SHOW "Detected language:" 
+    - \n ONLY FOR LINE BREAKS
+    - PRESERVE NAMES: ${firstname}/${Username}`;
+    
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -146,9 +150,12 @@ const closing = isEnglish
           messages: [
             {
               role: "system",
-              content:
-                "You are a professional LinkedIn assistant. Create concise, friendly responses (2-3 sentences) that maintain professional tone. Focus on clear communication and proper business etiquette.",
-            },
+              content: `You are a multilingual assistant. Critical rules:
+              1. Detect language but NEVER mention detection
+              2. Only output formatted reply
+              3. Never add comments/notes
+              4. Format strictly:
+                 [Greeting]\n[Response]\n[Closing]` },
             {
               role: "user",
               content: prompt,
@@ -173,7 +180,14 @@ const closing = isEnglish
   
       // Format the text (replace newlines with <br> for proper formatting)
       const formattedText = text.replace(/\n/g, "<br>");
+      Object.assign(replyBox.style, {
+        color:        "black",   // text color
+        fontSize:     "14px",    // font size
+        fontWeight:   "bold"     // font weight
+      });
       replyBox.innerHTML = formattedText;
+
+      
   
       // Simulate input event to activate the send button
       const inputEvent = new Event("input", { bubbles: true });
