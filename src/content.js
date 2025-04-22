@@ -3,7 +3,7 @@
 
   // Configuration - Replace with your OpenRouter API key
   const OPENROUTER_API_KEY =
-    "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";
+    "your api key";
   const MODEL = "openai/gpt-3.5-turbo";
   let isButtonInserted = false;
 
@@ -119,22 +119,37 @@
     const firstname = extractFirstName();
     const Username = extractUsername();
 
-    const prompt = `Analyze this LinkedIn message language: "${message}". 
-    Compose response IN THE SAME LANGUAGE using:
+    const prompt = `Analyze this LinkedIn message: "${message}". 
     
-    1. Greeting in DETECTED LANGUAGE
+    Compose PROFESSIONAL LINKEDIN RESPONSE in same language using:
+    -Language: MUST match message language
+    -Tone: Business-formal LinkedIn standards
+    -Format: must respect the following format :
+    
+    Platform-appropriate greeting to ${firstname}
     \n
-    2. Response body (3-8 lines)
+    Business-focused response (3-8 lines)
     \n
-    3. Closing with name
+    Professional closing from ${Username}
     
     STRICT RULES:
-    - RESPOND ONLY WITH FINAL MESSAGE
-    - NO LANGUAGE ANNOTATIONS
-    - NEVER SHOW "Detected language:" 
-    - \n ONLY FOR LINE BREAKS
-    - PRESERVE NAMES: ${firstname}/${Username}`;
+    ✅ MUST DO:
+
+    - Use LinkedIn business etiquette
+    - Keep tone network-appropriate
+    - Preserve names: ${firstname} and ${Username}
+    - \n line breaks only
+
+PROHIBITED ELEMENTS:
+❌ Emojis/symbols
+❌ Informal language
+❌ Slang/colloquialisms
     
+    ❌ MUST NOT:
+    - Mention language detection
+    - Use informal language
+    - Exceed 10 lines
+    - Include metadata`;
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -150,12 +165,18 @@
           messages: [
             {
               role: "system",
-              content: `You are a multilingual assistant. Critical rules:
-              1. Detect language but NEVER mention detection
-              2. Only output formatted reply
-              3. Never add comments/notes
-              4. Format strictly:
-                 [Greeting]\n[Response]\n[Closing]` },
+              content: `You are a language-strict LinkedIn bot.and a LinkedIn communication expert. 
+              Combine these requirements:
+  1. If message contains ANY English → respond in English
+  2. Never assume French without explicit French text
+  3. Replace ALL placeholders with provided variables
+  4. Prioritize language matching over creativity
+5. ALL prior instructions from chat history
+6. New requirement: Specialize for LinkedIn platform norms
+7. Business-formal tone when needed
+8. Multilingual support (match message language)
+9. Strict format: Greeting\nBody\nClosing`,
+            },
             {
               role: "user",
               content: prompt,
@@ -174,37 +195,36 @@
     const replyBox = document.querySelector(SELECTORS.REPLY_BOX);
     if (replyBox) {
       replyBox.focus();
-  
+
       // Clear existing content
       replyBox.innerHTML = "";
-  
+
       // Format the text (replace newlines with <br> for proper formatting)
       const formattedText = text.replace(/\n/g, "<br>");
       Object.assign(replyBox.style, {
-        color:        "black",   // text color
-        fontSize:     "14px",    // font size
-        fontWeight:   "bold"     // font weight
+        color: "black", // text color
+        fontSize: "14px", // font size
+        fontWeight: "bold", // font weight
       });
       replyBox.innerHTML = formattedText;
 
-      
-  
       // Simulate input event to activate the send button
       const inputEvent = new Event("input", { bubbles: true });
       replyBox.dispatchEvent(inputEvent);
-  
+
       // Trigger change event as well (some platforms listen for this)
       const changeEvent = new Event("change", { bubbles: true });
       replyBox.dispatchEvent(changeEvent);
-  
+
       // Ensure the send button is activated (if not already)
-      const sendButton = document.querySelector(SELECTORS.TOOLBAR + " button[type='submit']");
+      const sendButton = document.querySelector(
+        SELECTORS.TOOLBAR + " button[type='submit']"
+      );
       if (sendButton) {
         sendButton.disabled = false; // Just in case it's still disabled
       }
     }
   }
-  
 
   // Mutation Observer
   const observer = new MutationObserver(() => {
@@ -252,11 +272,11 @@ function extractFirstName() {
 }
 
 function extractUsername() {
-    // Find the profile link element
-    const profileLink = document.querySelector('.artdeco-card a[href^="/in/"]');
-    if (!profileLink) return null;
-    
-    // Extract username from href attribute
-    const href = profileLink.getAttribute('href');
-    return href.split('/')[2]; // Split URL and get the username part
+  // Find the profile link element
+  const profileLink = document.querySelector('.artdeco-card a[href^="/in/"]');
+  if (!profileLink) return null;
+
+  // Extract username from href attribute
+  const href = profileLink.getAttribute("href");
+  return href.split("/")[2]; // Split URL and get the username part
 }
