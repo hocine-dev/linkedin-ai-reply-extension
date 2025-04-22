@@ -1,20 +1,19 @@
 {
-    "name": "LinkedIn AI Assistant",
-    "version": "1.0",
-    "manifest_version": 3,
-    "permissions": ["activeTab"],
-    "host_permissions": [
-      "*://*.linkedin.com/*",
-      "https://openrouter.ai/*"
-    ],
-    "content_scripts": [
-      {
-        "matches": ["*://*.linkedin.com/*"],
-        "js": ["content.js"]
-      }
-    ],
-    "icons": {
-      "48": "icons/icon48.png"
+  "name": "LinkedIn AI Assistant",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["activeTab"],
+  "host_permissions": [
+    "*://*.linkedin.com/*",
+    "https://openrouter.ai/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.linkedin.com/*"],
+      "js": ["src/content.js"]
     }
+  ],
+  "icons": {
+    "48": "icons/icon48.png"
   }
-  
+}
